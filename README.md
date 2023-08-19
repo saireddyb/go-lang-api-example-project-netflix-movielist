@@ -1,7 +1,20 @@
 # go-lang-api-example-netflix-movielist
 
+## Table of Contents
+- [Description](#description)
+- [Installation](#installation)
+- [Clone the repo](#clone-the-repo)
+- [Install the dependencies](#install-the-dependencies)
+- [Run the server](#run-the-server)
+## Description
+This is a simple example of a REST API written in Go. It is a simple movie list API. It has the following features:
+- List all movies
+- Get a movie by id
+- Add a movie
+- Update a movie
+- Delete a movie
+- Update the rating of a movie
 
-create a documentation for this project to start locally
 
 ## Installation
 - Clone the repo
