@@ -1,1 +1,1 @@
-# go-lang-api-example-netflix-watchlist
+# go-lang-api-example-netflix-movielist
