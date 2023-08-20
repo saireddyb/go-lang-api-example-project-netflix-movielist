@@ -47,9 +47,8 @@ go run main.go
 - You can update a movie by navigating to `http://localhost:8000/movie/api/{id}` with method `PUT`
 - You can delete a movie by navigating to `http://localhost:8000/movie/api/{id}` with method `DELETE`
 - You can update the rating of a movie by navigating to `http://localhost:8000/api/movie/{id}/rating` with method `PUT`
+- You can see the list of directors by navigating to `http://localhost:8000/api/directors`
+- You can see the details of a director by navigating to `http://localhost:8000/api/director/{id}`
+- You can add a director by navigating to `http://localhost:8000/api/director/{id}` with method `POST`
+- You can see the list of countries by navigating to `http://localhost:8000/api/countries`
 
-# Tests 
-- Run the unit tests for all the endpoints
-```shell
-go test -v ./tests/
-```

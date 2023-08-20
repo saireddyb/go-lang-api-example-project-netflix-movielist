@@ -1,7 +1,18 @@
 package model
 
-type MoviesList struct {
-	Id     int
-	Movie  string
-	Rating int
+type Movies struct {
+	Id       int
+	Name     string
+	Rating   int
+	Director *Director
+}
+
+type Director struct {
+	Id          int
+	Name        string
+	Nationality Nationality
+}
+
+type Nationality struct {
+	Country string
 }
