@@ -31,6 +31,7 @@ func getAllMovies() []model.MoviesList {
 }
 func GetAllMovies(w http.ResponseWriter, r *http.Request) {
 	result := getAllMovies()
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
 }
 
@@ -48,6 +49,7 @@ func GetMovie(w http.ResponseWriter, r *http.Request) {
 	// convert the id from string to int
 	i, _ := strconv.Atoi(params["id"])
 	result := getMovie(i)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(result)
 }
 
@@ -58,6 +60,7 @@ func CreateMovie(w http.ResponseWriter, r *http.Request) {
 	var movie model.MoviesList
 	_ = json.NewDecoder(r.Body).Decode(&movie)
 	createMovie(movie)
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(movie)
 }
 

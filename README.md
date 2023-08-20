@@ -47,3 +47,9 @@ go run main.go
 - You can update a movie by navigating to `http://localhost:8000/movie/api/{id}` with method `PUT`
 - You can delete a movie by navigating to `http://localhost:8000/movie/api/{id}` with method `DELETE`
 - You can update the rating of a movie by navigating to `http://localhost:8000/api/movie/{id}/rating` with method `PUT`
+
+# Tests 
+- Run the unit tests for all the endpoints
+```shell
+go test -v ./tests/
+```
