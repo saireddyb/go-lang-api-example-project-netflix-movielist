@@ -1,18 +1,9 @@
 package model
 
+import "go.mongodb.org/mongo-driver/bson/primitive"
+
 type Movies struct {
-	Id       int
-	Name     string
-	Rating   int
-	Director *Director
-}
-
-type Director struct {
-	Id          int
-	Name        string
-	Nationality Nationality
-}
-
-type Nationality struct {
-	Country string
+	_id    primitive.ObjectID
+	Name   string
+	Rating int
 }
