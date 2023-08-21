@@ -150,23 +150,31 @@ func UpdateMovieRating(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllDirectors() []primitive.M {
-	filter := bson.D{}
-	cur, err := mongodb.DirectorColl.Find(context.Background(), filter)
+	matchStage := bson.D{{"$match", bson.D{}}}
+	lookupStage := bson.D{
+		{"$lookup", bson.D{
+			{"from", "countries"}, // Replace with actual countries collection name
+			{"localField", "nationalityId"},
+			{"foreignField", "_id"},
+			{"as", "nationalityDetails"},
+		}},
+	}
+	projectStage := bson.D{
+		{"$project", bson.D{
+			{"_id", 1},                // Include _id field if needed
+			{"name", 1},               // Include other fields you need
+			{"nationalityDetails", 1}, // Include nationalityDetails field
+		}},
+	}
+	cursor, err := mongodb.DirectorColl.Aggregate(context.Background(), mongo.Pipeline{matchStage, lookupStage, projectStage})
 	if err != nil {
-		fmt.Println("Error on Finding all the documents", err)
+		fmt.Println("Error on Aggregation", err)
 		panic(err)
 	}
-	defer cur.Close(context.Background())
-	var result []primitive.M
-	for cur.Next(context.Background()) {
-		var doc bson.M
-		err := cur.Decode(&doc)
-		if err != nil {
-			panic(err)
-		}
-		result = append(result, doc)
-	}
-	if err := cur.Err(); err != nil {
+	defer cursor.Close(context.Background())
+	var result []bson.M
+	if err := cursor.All(context.Background(), &result); err != nil {
+		fmt.Println("Error decoding cursor", err)
 		panic(err)
 	}
 	return result
@@ -179,15 +187,36 @@ func GetAllDirectors(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDirector(id primitive.ObjectID) primitive.M {
-	filter := bson.M{"_id": id}
-	var result primitive.M
-	err := mongodb.DirectorColl.FindOne(context.Background(), filter).Decode(&result)
-	if err == mongo.ErrNoDocuments {
-		fmt.Println("No document found")
-		return result
+	matchStage := bson.D{{"$match", bson.D{{"_id", id}}}}
+	lookupStage := bson.D{
+		{"$lookup", bson.D{
+			{"from", "countries"}, // Replace with actual countries collection name
+			{"localField", "nationalityId"},
+			{"foreignField", "_id"},
+			{"as", "nationalityDetails"},
+		}},
 	}
+	projectStage := bson.D{
+		{"$project", bson.D{
+			{"_id", 1},                // Include _id field if needed
+			{"name", 1},               // Include other fields you need
+			{"nationalityDetails", 1}, // Include nationalityDetails field
+		}},
+	}
+	cursor, err := mongodb.DirectorColl.Aggregate(context.Background(), mongo.Pipeline{matchStage, lookupStage, projectStage})
 	if err != nil {
+		fmt.Println("Error on Aggregation", err)
 		panic(err)
+	}
+	defer cursor.Close(context.Background())
+	var result bson.M
+	if cursor.Next(context.Background()) {
+		if err := cursor.Decode(&result); err != nil {
+			fmt.Println("Error decoding cursor", err)
+			panic(err)
+		}
+	} else {
+		fmt.Println("No document found")
 	}
 	return result
 }
