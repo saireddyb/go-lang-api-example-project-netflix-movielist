@@ -14,8 +14,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-const movieCollName = "movies"
-
 func homePage() {
 	doc := model.Movies{Name: "KGF", Rating: 5}
 	result, err := mongodb.MovieColl.InsertOne(context.TODO(), doc)
@@ -150,20 +148,20 @@ func UpdateMovieRating(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllDirectors() []primitive.M {
-	matchStage := bson.D{{"$match", bson.D{}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{}}}
 	lookupStage := bson.D{
-		{"$lookup", bson.D{
-			{"from", "countries"}, // Replace with actual countries collection name
-			{"localField", "nationalityId"},
-			{"foreignField", "_id"},
-			{"as", "nationalityDetails"},
+		{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "countries"}, // Replace with actual countries collection name
+			{Key: "localField", Value: "nationalityId"},
+			{Key: "foreignField", Value: "_id"},
+			{Key: "as", Value: "nationalityDetails"},
 		}},
 	}
 	projectStage := bson.D{
-		{"$project", bson.D{
-			{"_id", 1},                // Include _id field if needed
-			{"name", 1},               // Include other fields you need
-			{"nationalityDetails", 1}, // Include nationalityDetails field
+		{Key: "$project", Value: bson.D{
+			{Key: "_id", Value: 1},                // Include _id field if needed
+			{Key: "name", Value: 1},               // Include other fields you need
+			{Key: "nationalityDetails", Value: 1}, // Include nationalityDetails field
 		}},
 	}
 	cursor, err := mongodb.DirectorColl.Aggregate(context.Background(), mongo.Pipeline{matchStage, lookupStage, projectStage})
