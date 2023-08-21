@@ -96,6 +96,20 @@ func CreateMovie(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "name is a required field")
 		return
 	}
+	directorId := movie.DirectorID
+	if directorId.IsZero() {
+		fmt.Println("Director not found")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "Director not found")
+		return
+	}
+	director := getDirector(directorId)
+	if director == nil {
+		fmt.Println("Director not found")
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "Director not found")
+		return
+	}
 	result := createMovie(movie)
 	json.NewEncoder(w).Encode(result)
 }

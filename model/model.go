@@ -3,9 +3,9 @@ package model
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Movies struct {
-	Name   string `json:"name"`
-	Rating int    `json:"rating"`
-	// DirectorID primitive.ObjectID `bson:"directorId"`
+	Name       string             `json:"name"`
+	Rating     int                `json:"rating"`
+	DirectorID primitive.ObjectID `bson:"directorId"`
 }
 
 type Directors struct {
