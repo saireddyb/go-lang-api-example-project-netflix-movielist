@@ -1,7 +1,7 @@
 version: "3.3"
 
 services:
-  webapp:
+  netflix-api:
     build:
       context: ./
       dockerfile: Dockerfile
@@ -10,7 +10,8 @@ services:
       - "8080:8080"
     environment:
       MONGODB_URI: mongodb://database:27017/test
-  database:
+  mongo:
     image: mongo:latest
+    container_name: mongo
     ports:
       - "27017:27017"
