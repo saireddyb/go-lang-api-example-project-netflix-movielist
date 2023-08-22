@@ -199,20 +199,20 @@ func GetAllDirectors(w http.ResponseWriter, r *http.Request) {
 }
 
 func getDirector(id primitive.ObjectID) primitive.M {
-	matchStage := bson.D{{"$match", bson.D{{"_id", id}}}}
+	matchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "_id", Value: id}}}}
 	lookupStage := bson.D{
-		{"$lookup", bson.D{
-			{"from", "countries"}, // Replace with actual countries collection name
-			{"localField", "nationalityId"},
-			{"foreignField", "_id"},
-			{"as", "nationalityDetails"},
+		{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: "countries"}, // Replace with actual countries collection name
+			{Key: "localField", Value: "nationalityId"},
+			{Key: "foreignField", Value: "_id"},
+			{Key: "as", Value: "nationalityDetails"},
 		}},
 	}
 	projectStage := bson.D{
-		{"$project", bson.D{
-			{"_id", 1},                // Include _id field if needed
-			{"name", 1},               // Include other fields you need
-			{"nationalityDetails", 1}, // Include nationalityDetails field
+		{Key: "$project", Value: bson.D{
+			{Key: "_id", Value: 1},                // Include _id field if needed
+			{Key: "name", Value: 1},               // Include other fields you need
+			{Key: "nationalityDetails", Value: 1}, // Include nationalityDetails field
 		}},
 	}
 	cursor, err := mongodb.DirectorColl.Aggregate(context.Background(), mongo.Pipeline{matchStage, lookupStage, projectStage})
@@ -242,6 +242,21 @@ func GetDirector(w http.ResponseWriter, r *http.Request) {
 }
 
 func createDirector(director model.Directors) *mongo.InsertOneResult {
+	if director.Name == "" {
+		fmt.Println("name is a required field")
+		return nil
+	}
+	countryId := director.NationalityID
+	if countryId.IsZero() {
+		fmt.Println("country is a required field")
+		return nil
+	}
+	country := getCountry(countryId)
+	if country == nil {
+		fmt.Println("country not found")
+		return nil
+	}
+
 	result, err := mongodb.DirectorColl.InsertOne(context.Background(), director)
 	if err != nil {
 		fmt.Println("Error on inserting new Director", err)
@@ -253,27 +268,6 @@ func createDirector(director model.Directors) *mongo.InsertOneResult {
 func CreateDirector(w http.ResponseWriter, r *http.Request) {
 	var director model.Directors
 	_ = json.NewDecoder(r.Body).Decode(&director)
-	if director.Name == "" {
-		fmt.Println("name is a required field")
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "name is a required field")
-		return
-	}
-	countryId := director.NationalityID
-	if countryId.IsZero() {
-		fmt.Println("country is a required field")
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "country is a required field")
-		return
-	}
-	country := getCountry(countryId)
-	if country == nil {
-		fmt.Println("country not found")
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "country not found")
-		return
-	}
-	director.NationalityID = countryId
 	result := createDirector(director)
 	json.NewEncoder(w).Encode(result)
 }
@@ -349,4 +343,36 @@ func CreateCountry(w http.ResponseWriter, r *http.Request) {
 	}
 	result := createCountry(country)
 	json.NewEncoder(w).Encode(result)
+}
+
+func AddInitialData(w http.ResponseWriter, r *http.Request) {
+	countries := []model.Countries{
+		{Name: "India"},
+		{Name: "USA"},
+		{Name: "UK"},
+	}
+	countriesId := []primitive.ObjectID{}
+	for _, country := range countries {
+		result := createCountry(country)
+		countriesId = append(countriesId, result.InsertedID.(primitive.ObjectID))
+	}
+	directors := []model.Directors{
+		{Name: "Prashanth Neel", NationalityID: countriesId[0]},
+		{Name: "Christopher Nolan", NationalityID: countriesId[1]},
+		{Name: "Guy Ritchie", NationalityID: countriesId[2]},
+	}
+	directorsId := []primitive.ObjectID{}
+	for _, director := range directors {
+		result := createDirector(director)
+		directorsId = append(directorsId, result.InsertedID.(primitive.ObjectID))
+	}
+	movies := []model.Movies{
+		{Name: "KGF", Rating: 5, DirectorID: directorsId[0]},
+		{Name: "Interstellar", Rating: 5, DirectorID: directorsId[1]},
+		{Name: "The Gentlemen", Rating: 5, DirectorID: directorsId[2]},
+	}
+	for _, movie := range movies {
+		createMovie(movie)
+	}
+	fmt.Println("Initial data added")
 }

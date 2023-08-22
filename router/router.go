@@ -20,5 +20,6 @@ func Router() *mux.Router {
 	router.HandleFunc("/api/countries", controller.GetAllCountries).Methods("GET")
 	router.HandleFunc("/api/country/{id}", controller.GetCountry).Methods("GET")
 	router.HandleFunc("/api/country", controller.CreateCountry).Methods("POST")
+	router.HandleFunc("/api/initialdata", controller.AddInitialData).Methods("POST")
 	return router
 }
