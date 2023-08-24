@@ -19,7 +19,11 @@ This is a simple example of a REST API written in Go. It is a simple movie list 
 - Add a director
 - Add initial data to the database
 
-
+## Start with docker
+```shell
+docker run -d --net host -e MONGODB_URI=mongodb://localhost:27017/netflix-api --name netflix-api ghcr.io/saireddyb/go-lang-api-example-project-netflix-movielist:main
+```
+Application will be accessible at 8080 port
 ## Installation
 - Clone the repo
 - Install the dependencies
